@@ -15,6 +15,7 @@ class textCompare():
       sample = ''.join(ch for ch in sample if ch not in self.punctuation)
       return sample
 
+    # No sense using commonly used words in the comparison
     def removeCommonWords(self, words: [str]):
       words = [item for item in words if item not in self.commonWords]
       return words
@@ -26,6 +27,7 @@ class textCompare():
       words = [each_string.lower() for each_string in words]
       return words
 
+    # returns a dictionary of all distinct words and counts used in the sample text
     def extractWords(self, sample: str):
       wordsDict = {}
       words = self.getLowerCaseWords(sample)
@@ -40,11 +42,13 @@ class textCompare():
 
       return wordsDict
 
+    # returns a lits of the distinct keys present in either of two dictionaries
     def getAllElements(self, dict1, dict2):
       mergedDict = {**dict1, **dict2}
       keysList = list(mergedDict.keys())
       return keysList
 
+    # compares two input dictionaries and returns a score between 0 and 1 based on how they match
     def compareDictionaries(self, dict1, dict2):
       distinctElements = self.getAllElements(dict1, dict2)
       distinctItems = 0
@@ -72,6 +76,7 @@ class textCompare():
       print("commonItems: ", commonItems, "distinctItems: ", distinctItems)
       return commonItems/distinctItems
 
+    # creates a list of all sentences used in the sample text
     def createListOfSentences(self, sample):
       sentenceTerminators = [".","!","?"]
       # Parse on any of ., !, ? and create a list of sentences
@@ -83,6 +88,7 @@ class textCompare():
       sentences.remove('')
       return sentences
 
+    # returns a dictionary of all distinct sentences and counts used in the sample text
     def extractSentences(self, sample):
       sentencesDict = {}
       sentences = self.createListOfSentences(sample)
@@ -93,6 +99,7 @@ class textCompare():
           sentencesDict[sentences[i]] = 1
       return sentencesDict
 
+    # creates a list of phrases (which are just strings of phraseLength words)
     def createListOfPhrases(self, sample, phraseLength):
       phrases = []
       words = self.getLowerCaseWords(sample)
@@ -104,6 +111,8 @@ class textCompare():
 
       return phrases
 
+    # returns a dictionary of all distinct phrases and counts of phraseLength used in the sample text
+    # Note: these phrases may span the end of a sentence.
     def extractPhrases(self, sample, phraseLength):
       phrasesDict = {}
       phrases = self.createListOfPhrases(sample, phraseLength)
@@ -114,18 +123,22 @@ class textCompare():
           phrasesDict[phrases[i]] = 1
       return phrasesDict
 
+    # provides a score between 0 and 1 by comparing all words used in both samples
     def compareCommonWords(self, sample1, sample2):
       wordsDict1 = self.extractWords(sample1)
       wordsDict2 = self.extractWords(sample2)
       result = round(self.compareDictionaries(wordsDict1, wordsDict2), self.precision)
       return result
 
+    # provides a score between 0 and 1 by comparing all sentences used in both samples
     def compareSentences(self, sample1, sample2):
       sentenceDict1 = self.extractSentences(sample1)
       sentenceDict2 = self.extractSentences(sample2)
       result = round(self.compareDictionaries(sentenceDict1, sentenceDict2), self.precision)
       return result
 
+    # provices a score between 0 and 1 by comparing all phrases between minPhraseLength and maxPhraseLength in size
+    # used in both samples
     def comparePhrases(self, sample1, sample2):
       result = 0
       for i in range(self.minPhraseLength, self.maxPhraseLength + 1):
@@ -137,6 +150,7 @@ class textCompare():
       return result
 
 def main():
+    # Note: cannot pass in arguments without importing sys or getopts libraries
     with open('file1.txt', 'r') as file:
       sample1 = file.read().replace('\n', '')
 
@@ -160,6 +174,8 @@ def main():
       phraseResult = tc.comparePhrases(sample1, sample2)
       print("phraseResult: ", phraseResult)
 
+      # The final result is just the average of the 3
+      # Generally the results will be < 0.5 and could still be relatively similar
       result = (wordResult + sentenceResult + phraseResult) / 3
 
     print("File comparison result: ", round(result, 2))
