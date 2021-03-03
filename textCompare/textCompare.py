@@ -1,6 +1,5 @@
 #
 # Compares two text files (file1.txt and file2.txt) and scores their similarity between 0 (no-similarity) and 1 (identical)
-# Note: cannot include sys or getopt libraries to read command-line arguments
 #
 
 class textCompare():
@@ -150,11 +149,12 @@ class textCompare():
       return result
 
 def main():
-    # Note: cannot pass in arguments without importing sys or getopts libraries
-    with open('file1.txt', 'r') as file:
+    file1 = input("Enter your first file: ")
+    with open(file1, 'r') as file:
       sample1 = file.read().replace('\n', '')
 
-    with open('file2.txt', 'r') as file:
+    file2 = input("Enter your second file: ")
+    with open(file2, 'r') as file:
       sample2 = file.read().replace('\n', '')
 
     if sample1 == sample2:
